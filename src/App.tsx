@@ -1,4 +1,5 @@
 import logo from './assets/logo-nlw-expert.svg'
+import { NoteCard } from './components/note-card'
 
 
 export function App() {
@@ -25,8 +26,7 @@ export function App() {
                 Grave uma nota em áudio que será convertida para texto automaticamente.
               </p>
             </div>
-
-          <NoteCard />
+            <NoteCard/>
 
         </div>
 
