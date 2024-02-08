@@ -12,7 +12,6 @@ interface Note {
 
 export function App() {
   const [search, setSearch] = useState('')
-
   const [notes, setNotes] = useState<Note[]>(() => {
     const notesOnStorage = localStorage.getItem('notes')
   
@@ -32,6 +31,16 @@ function onNoteCreate(content: string) {
   const notesArray = [newNote, ...notes]
 
   setNotes(notesArray) 
+  localStorage.setItem('notes', JSON.stringify(notesArray))
+
+}
+
+function onNoteDeleted(id: string) {
+  const notesArray = notes.filter(note => {
+    return note.id !== id
+  })
+
+  setNotes(notesArray)
   localStorage.setItem('notes', JSON.stringify(notesArray))
 
 }
@@ -64,7 +73,7 @@ const filteredNotes = search != ''
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[250px] gap-6'>
             <NewNoteCard onNoteCreated={onNoteCreate}  />
             {filteredNotes.map(note => {
-              return <NoteCard key={note.id} note={note}/>
+              return <NoteCard key={note.id} note={note} onNoteDeleted={onNoteDeleted}/>
             })}
 
         </div>
