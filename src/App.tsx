@@ -1,27 +1,50 @@
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import logo from './assets/logo-nlw-expert.svg'
 import { NewNoteCard } from './components/new-note-card'
 import { NoteCard } from './components/note-card'
 
 
-
+interface Note {
+  id: string
+  date: Date 
+  content: string
+}
 
 export function App() {
-const [notes, setNotes] = useState([
-  { id: 1, date: new Date(), content: 'Hello World'}
-])
+  const [search, setSearch] = useState('')
+
+  const [notes, setNotes] = useState<Note[]>(() => {
+    const notesOnStorage = localStorage.getItem('notes')
+  
+    if(notesOnStorage){
+      return JSON.parse(notesOnStorage)
+    }
+
+    return []
+  })
 
 function onNoteCreate(content: string) {
   const newNote = {
-    id: Math.random(), 
+    id: crypto.randomUUID(), 
     date: new Date(),
     content,
   }
+  const notesArray = [newNote, ...notes]
 
-  setNotes([newNote, ...notes])
+  setNotes(notesArray) 
+  localStorage.setItem('notes', JSON.stringify(notesArray))
 
 }
 
+function handleSearch(event: ChangeEvent<HTMLInputElement>) {
+  const query = event.target.value 
+
+  setSearch(query)
+}
+
+const filteredNotes = search != ''
+  ? notes.filter(note => note.content.toLocaleLowerCase().includes(search))
+  :notes
 
   return (    
     <div className='mx-auto max-w-6xl my-12 space-y-6'>
@@ -31,6 +54,7 @@ function onNoteCreate(content: string) {
           <input 
             type="text" 
             placeholder='Busque em suas notas...' 
+            onChange={handleSearch}
             className='w-full bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-slate-500'
           />
         </form>
@@ -39,7 +63,7 @@ function onNoteCreate(content: string) {
 
         <div className='grid grid-cols-3 auto-rows-[250px] gap-6'>
             <NewNoteCard onNoteCreated={onNoteCreate}  />
-            {notes.map(note => {
+            {filteredNotes.map(note => {
               return <NoteCard key={note.id} note={note}/>
             })}
 
